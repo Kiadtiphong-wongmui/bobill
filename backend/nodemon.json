@@ -1,0 +1,8 @@
+{
+    "watch": ["src"],
+    "ext": "ts",
+    "legacyWatch": true,
+    "delay": "200ms",
+    "exec": "tsx ./src/app.ts"
+  }
+  

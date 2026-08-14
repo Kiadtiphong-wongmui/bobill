@@ -1,0 +1,98 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bobill-postgres-dev
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: bobill-pgadmin-dev
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./servers.json:/pgadmin4/servers.json:ro
+      - ./pgpass:/pgpass:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bobill-backend-dev
+    working_dir: /app
+    command: npm run dev -- -L
+    env_file:
+      - ./.env
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=500
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bobill-frontend-dev
+    working_dir: /app
+    command: npm run dev -- -H 0.0.0.0 -p 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - BACKEND_API_URL=http://backend:3000
+      - AUTH_SECRET=${AUTH_SECRET}
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_WEBPACK_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=500
+    depends_on:
+      - backend
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: bobill-ngrok
+    profiles: ["ngrok"]
+    restart: unless-stopped
+    command: http --url=${NGROK_URL} frontend:3000 --log stdout
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    ports:
+      - "4040:4040"
+    depends_on:
+      - frontend
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  backend_node_modules:
+  frontend_node_modules:

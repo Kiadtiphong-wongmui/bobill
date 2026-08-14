@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "bobill",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "bobill",
+      "Username": "bobill_user",
+      "SSLMode": "prefer",
+      "PassFile": "/var/lib/pgadmin/.pgpass"
+    }
+  }
+}

@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       Int      @id @default(autoincrement()) 
+  username  String   @unique
+  password  String 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roles     Role[]   @default([USER])
+}
+
+model Invoice {
+  id                  Int             @id @default(autoincrement())
+  invoiceNumber       String          @unique
+  documentDate        DateTime
+  paymentTerms        String?
+  creditDays          Int?
+  sellerCompanyName   String
+  sellerAddress       String
+  sellerTaxId         String?
+  sellerPhone         String?
+  sellerEmail         String?
+  includeBuyer        Boolean         @default(true)
+  buyerCompanyName    String?
+  buyerAddress        String?
+  buyerTaxId          String?
+  subtotal            Decimal         @db.Decimal(12, 2)
+  discountTotal       Decimal         @default(0) @db.Decimal(12, 2)
+  grandTotal          Decimal         @db.Decimal(12, 2)
+  note                String?
+  amountInWords       String?
+  signatures          Json?
+  status              InvoiceStatus   @default(DRAFT)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  items               InvoiceItem[]
+}
+
+model InvoiceItem {
+  id            Int      @id @default(autoincrement())
+  invoiceId     Int
+  lineNo        Int
+  description   String
+  quantity      Decimal  @db.Decimal(12, 2)
+  unitPrice     Decimal  @db.Decimal(12, 2)
+  lineTotal     Decimal  @db.Decimal(12, 2)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@unique([invoiceId, lineNo])
+}
+
+model EmployeeCard {
+  id             Int      @id @default(autoincrement())
+  cardHeader     String   // หัวข้อบัตร เช่น "พนักงานขายของหน้าร้าน (คนต่างด้าว)"
+  photoUrl       String?  // ลิงก์รูปภาพพนักงาน
+  name           String   // ชื่อ-สกุล
+  nationality    String   // สัญชาติ
+  workPermitNo   String   // เลขที่ใบอนุญาตทำงาน
+  
+  // ด้านหลังบัตร
+  instructions   String   // คำแนะนำ (รองรับหลายบรรทัด แบ่งด้วยขึ้นบรรทัดใหม่ \n)
+  employerName   String   // ชื่อนายจ้าง/สถานประกอบการ
+  address        String   // ตั้งอยู่เลขที่
+  issueDate      DateTime // วันออกบัตร
+  expiryDate     DateTime // วันหมดอายุ
+  signerName     String   // ชื่อผู้ลงนามออกบัตร
+  signerPosition String   // ตำแหน่งผู้ลงนาม
+  telephone      String   // โทรศัพท์
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  CANCELLED
+}
+

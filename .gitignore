@@ -15,7 +15,6 @@ npm-debug.log
 
 # Generated Prisma  
 backend/src/generated/prisma
-src/
 test/
 
 # bobill workspace

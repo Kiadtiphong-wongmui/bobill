@@ -120,9 +120,8 @@ export function InvoiceEditorPreview({ form, itemTotals, subtotal, grandTotal }:
             </p>
           ) : null}
           {form.note ? (
-            <p className="mt-1 text-zinc-600">
-              <span className="font-medium text-zinc-700">หมายเหตุ: </span>
-              {form.note}
+            <p className="mt-1 whitespace-pre-wrap text-red-600">
+              * {form.note}
             </p>
           ) : null}
         </div>

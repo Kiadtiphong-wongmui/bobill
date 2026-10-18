@@ -304,6 +304,8 @@ const drawFreeNamesRow = (
   });
 };
 
+const NOTE_PREFIX = "* ";
+const NOTE_COLOR = "#c0392b";
 const SUMMARY_GAP_X = 12;
 const SUMMARY_TOP_GAP = 6;
 const SUMMARY_TOTALS_HEIGHT = SUMMARY_ROW_HEIGHT * 3 + SUMMARY_ROW_GAP * 2;
@@ -318,7 +320,7 @@ const getSummaryHeight = (
 ): number => {
   const noteWidth = contentWidth - getSummaryRightWidth(contentWidth) - SUMMARY_GAP_X;
   const noteHeight = invoice.note
-    ? measureTextHeight(doc, `หมายเหตุ: ${invoice.note}`, noteWidth, fontNames.regular, SIZE_BODY)
+    ? measureTextHeight(doc, `${NOTE_PREFIX}${invoice.note}`, noteWidth, fontNames.regular, SIZE_BODY)
     : 0;
   return SUMMARY_TOP_GAP + Math.max(noteHeight, SUMMARY_TOTALS_HEIGHT);
 };
@@ -335,10 +337,11 @@ const drawSummary = (
   const noteWidth = contentWidth - rightWidth - SUMMARY_GAP_X;
   let y = top + SUMMARY_TOP_GAP;
   if (invoice.note) {
-    doc.font(fontNames.regular).fontSize(SIZE_BODY).text(`หมายเหตุ: ${invoice.note}`, PAGE_MARGIN, y, {
+    doc.fillColor(NOTE_COLOR).font(fontNames.regular).fontSize(SIZE_BODY).text(`${NOTE_PREFIX}${invoice.note}`, PAGE_MARGIN, y, {
       width: noteWidth,
       lineGap: compactLineGap(SIZE_BODY),
     });
+    doc.fillColor("black");
   }
   const totals = [
     { label: "รวมเงิน", value: formatMoney(invoice.subtotal), bold: false },

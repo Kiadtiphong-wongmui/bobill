@@ -466,6 +466,7 @@ export function InvoiceEditorForm({
             <textarea
               className={`${inputClass} resize-none`}
               rows={2}
+              placeholder="เช่น ค่าดำเนินการ ต่อใบอนุญาตทำงาน (แสดงใต้ตารางรายการเป็นสีแดง)"
               value={form.note}
               onChange={(e) => setForm((prev) => ({ ...prev, note: e.target.value }))}
             />

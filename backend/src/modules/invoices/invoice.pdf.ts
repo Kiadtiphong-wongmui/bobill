@@ -119,9 +119,13 @@ const drawFullHeader = (
   gap: number,
 ): number => {
   const contentWidth = doc.page.width - PAGE_MARGIN * 2;
+  // Spacing scales with the auto-fit headerGap so short invoices breathe and long ones stay compact.
+  const sectionGap = gap * 1.5 + 2;
+  const lineSpacing = gap / 2 + 2;
+  const bodySize = gap >= 6 ? SIZE_BODY + 1 : SIZE_BODY;
   let y = PAGE_MARGIN;
-  y += writeText(doc, invoice.sellerCompanyName, PAGE_MARGIN, y, contentWidth, fontNames.bold, SIZE_TITLE, "center") + gap;
-  y += writeText(doc, invoice.sellerAddress, PAGE_MARGIN, y, contentWidth, fontNames.regular, SIZE_SUBTITLE, "center") + 1;
+  y += writeText(doc, invoice.sellerCompanyName, PAGE_MARGIN, y, contentWidth, fontNames.bold, SIZE_TITLE, "center") + lineSpacing;
+  y += writeText(doc, invoice.sellerAddress, PAGE_MARGIN, y, contentWidth, fontNames.regular, SIZE_SUBTITLE, "center") + lineSpacing;
   y += writeText(
     doc,
     `เลขประจำตัวผู้เสียภาษี: ${invoice.sellerTaxId ?? "-"}   เบอร์โทร: ${invoice.sellerPhone ?? "-"}   อีเมล: ${invoice.sellerEmail ?? "-"}`,
@@ -131,8 +135,8 @@ const drawFullHeader = (
     fontNames.regular,
     SIZE_SUBTITLE,
     "center",
-  ) + gap;
-  y += writeText(doc, "ใบแจ้งหนี้", PAGE_MARGIN, y, contentWidth, fontNames.bold, 18, "center") + gap;
+  ) + sectionGap;
+  y += writeText(doc, "ใบแจ้งหนี้", PAGE_MARGIN, y, contentWidth, fontNames.bold, 18, "center") + sectionGap;
 
   const details = [
     `เลขที่ใบแจ้งหนี้: ${invoice.invoiceNumber}`,
@@ -141,22 +145,22 @@ const drawFullHeader = (
     `เครดิต: ${invoice.creditDays ?? "-"} วัน`,
   ];
   for (const detail of details) {
-    y += writeText(doc, detail, PAGE_MARGIN, y, contentWidth, fontNames.regular, SIZE_BODY) + 1;
+    y += writeText(doc, detail, PAGE_MARGIN, y, contentWidth, fontNames.regular, bodySize) + lineSpacing;
   }
 
   if (invoice.includeBuyer !== false) {
-    y += gap;
+    y += lineSpacing;
     const buyerDetails = [
       `ผู้ซื้อ: ${invoice.buyerCompanyName ?? "-"}`,
       `ที่อยู่: ${invoice.buyerAddress ?? "-"}`,
       `เลขประจำตัวผู้เสียภาษี: ${invoice.buyerTaxId ?? "-"}`,
     ];
     for (const detail of buyerDetails) {
-      y += writeText(doc, detail, PAGE_MARGIN, y, contentWidth, fontNames.regular, SIZE_BODY) + 1;
+      y += writeText(doc, detail, PAGE_MARGIN, y, contentWidth, fontNames.regular, bodySize) + lineSpacing;
     }
   }
 
-  return y + gap;
+  return y + sectionGap;
 };
 
 const getTableWidths = (doc: PDFKit.PDFDocument): number[] => {

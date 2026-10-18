@@ -55,7 +55,7 @@ export function InvoiceEditorHeader({ title, enableSaveDefaults, onSaveDefaultsA
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
             </svg>
-            กลับรายการใบเสร็จ
+            กลับรายการใบแจ้งหนี้
           </Link>
           <Link href="/" className={headerNavHomeClass}>
             <svg

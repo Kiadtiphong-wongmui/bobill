@@ -454,7 +454,7 @@ export function InvoiceEditorForm({
             </select>
           </label>
           <label className="text-sm text-zinc-700 md:col-span-2">
-            <span className="font-medium">จำนวนเงินตัวอักษร</span>
+            <span className="font-medium">จำนวนตัวอักษร</span>
             <input
               className={inputClass}
               value={form.amountInWords}

@@ -52,7 +52,8 @@ export type InvoiceAutoFitSettings = {
 };
 
 const PAGE_MARGIN = INVOICE_PDF_CONFIG.pageMargin;
-const TABLE_HEADER_HEIGHT = 18;
+const TABLE_HEADER_HEIGHT = 24;
+const ROW_PADDING_SCALE = 1.75;
 const CELL_PADDING_X = 4;
 const TABLE_HEADERS = ["ลำดับ", "รายการสินค้า / บริการ", "จำนวน", "ราคา / หน่วย", "จำนวนเงิน"] as const;
 const SIZE_TITLE = 16;
@@ -188,7 +189,7 @@ const measureTableRowHeight = (
     const cellWidth = (widths[index] ?? 0) - CELL_PADDING_X * 2;
     return Math.max(largest, measureTextHeight(doc, value, cellWidth, fontName, fontSize));
   }, 0);
-  return Math.ceil(textHeight + padding * 2);
+  return Math.ceil(textHeight + padding * ROW_PADDING_SCALE * 2);
 };
 
 const isFreeName = (row: PdfRow): boolean =>
@@ -249,9 +250,9 @@ const drawTableHeader = (
   TABLE_HEADERS.forEach((label, index) => {
     const width = widths[index] ?? 0;
     doc.rect(x, y, width, TABLE_HEADER_HEIGHT).stroke();
-    doc.font(fontNames.bold).fontSize(fontSize).text(label, x + CELL_PADDING_X, y + 3, {
+    doc.font(fontNames.bold).fontSize(fontSize).text(label, x + CELL_PADDING_X, y + 6, {
       width: width - CELL_PADDING_X * 2,
-      height: TABLE_HEADER_HEIGHT - 6,
+      height: TABLE_HEADER_HEIGHT - 8,
       align: index >= 2 ? "right" : "left",
       lineBreak: false,
       ellipsis: true,
@@ -275,10 +276,10 @@ const drawItemRow = (
   getRowValues(row).forEach((value, index) => {
     const width = widths[index] ?? 0;
     doc.rect(x, y, width, rowHeight).stroke();
-    doc.font(fontNames.regular).fontSize(fontSize).text(value, x + CELL_PADDING_X, y + padding, {
+    doc.font(fontNames.regular).fontSize(fontSize).text(value, x + CELL_PADDING_X, y + padding * ROW_PADDING_SCALE, {
       width: width - CELL_PADDING_X * 2,
-      height: rowHeight - padding * 2,
-      align: index === 0 ? "center" : index >= 2 ? "right" : "left",
+      height: rowHeight - padding * ROW_PADDING_SCALE * 2,
+      align: index >= 2 ? "right" : "left",
       lineGap: compactLineGap(fontSize),
       ellipsis: true,
     });
@@ -371,7 +372,7 @@ const getFooterHeight = (
 ): number => {
   const amountHeight = measureTextHeight(
     doc,
-    `จำนวนเงินตัวอักษร: ${invoice.amountInWords ?? "-"}`,
+    `จำนวนตัวอักษร: ${invoice.amountInWords ?? "-"}`,
     contentWidth,
     fontNames.regular,
     SIZE_BODY,
@@ -388,7 +389,7 @@ const drawFooter = (
   contentWidth: number,
 ): void => {
   let y = top;
-  const amountText = `จำนวนเงินตัวอักษร: ${invoice.amountInWords ?? "-"}`;
+  const amountText = `จำนวนตัวอักษร: ${invoice.amountInWords ?? "-"}`;
   const amountHeight = measureTextHeight(doc, amountText, contentWidth, fontNames.regular, SIZE_BODY);
   doc.font(fontNames.regular).fontSize(SIZE_BODY).text(amountText, PAGE_MARGIN, y, {
     width: contentWidth,

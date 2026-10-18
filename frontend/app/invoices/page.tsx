@@ -80,7 +80,7 @@ export default function InvoiceListPage() {
         }
       } catch (error) {
         if (!cancelled) {
-          setErrorMessage(error instanceof Error ? error.message : "ไม่สามารถโหลดรายการใบเสร็จได้");
+          setErrorMessage(error instanceof Error ? error.message : "ไม่สามารถโหลดรายการใบแจ้งหนี้ได้");
         }
       } finally {
         if (!cancelled) {
@@ -140,7 +140,7 @@ export default function InvoiceListPage() {
     <AppPageShell>
       <header className="flex flex-col gap-4 border-b border-zinc-200/80 pb-5 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">รายการใบเสร็จ</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">รายการใบแจ้งหนี้</h1>
           <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
             ค้นหาและกรองจากด้านล่าง การดำเนินการแต่ละใบอยู่ในเมนู <span className="font-medium text-zinc-800 dark:text-zinc-200">จัดการ</span>{" "}
             ที่ปลายแถว

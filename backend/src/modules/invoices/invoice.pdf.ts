@@ -370,14 +370,11 @@ const getFooterHeight = (
   fontNames: ReturnType<typeof selectPdfFonts>,
   contentWidth: number,
 ): number => {
-  const amountHeight = measureTextHeight(
-    doc,
-    `จำนวนตัวอักษร: ${invoice.amountInWords ?? "-"}`,
-    contentWidth,
-    fontNames.regular,
-    SIZE_BODY,
-  );
-  return amountHeight + 10 + FOOTER_SIGNATURE_HEIGHT;
+  void doc;
+  void invoice;
+  void fontNames;
+  void contentWidth;
+  return FOOTER_SIGNATURE_HEIGHT;
 };
 
 const drawFooter = (
@@ -388,15 +385,8 @@ const drawFooter = (
   top: number,
   contentWidth: number,
 ): void => {
-  let y = top;
-  const amountText = `จำนวนตัวอักษร: ${invoice.amountInWords ?? "-"}`;
-  const amountHeight = measureTextHeight(doc, amountText, contentWidth, fontNames.regular, SIZE_BODY);
-  doc.font(fontNames.regular).fontSize(SIZE_BODY).text(amountText, PAGE_MARGIN, y, {
-    width: contentWidth,
-    lineGap: compactLineGap(SIZE_BODY),
-  });
-  y += amountHeight;
-  y += 10;
+  void invoice;
+  const y = top;
 
   const blockGap = 40;
   const blockWidth = (contentWidth - blockGap * 2) / 3;

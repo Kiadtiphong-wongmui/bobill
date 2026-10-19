@@ -74,13 +74,13 @@ export function arabicToThaiBahtText(amount: number | string): string {
   const positions = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"];
 
   const fixedStr = num.toFixed(2);
-  const [bahtStr, satangStr] = fixedStr.split(".");
+  const [bahtStr = "0", satangStr = "00"] = fixedStr.split(".");
 
   function convertGroup(str: string): string {
     let result = "";
     const len = str.length;
     for (let i = 0; i < len; i++) {
-      const digit = parseInt(str[i], 10);
+      const digit = parseInt(str[i] ?? "0", 10);
       const pos = len - i - 1;
 
       if (digit !== 0) {
@@ -91,7 +91,7 @@ export function arabicToThaiBahtText(amount: number | string): string {
         } else if (pos === 0 && digit === 1 && len > 1) {
           result += "เอ็ด";
         } else {
-          result += digits[digit] + positions[pos];
+          result += (digits[digit] ?? "") + (positions[pos] ?? "");
         }
       }
     }

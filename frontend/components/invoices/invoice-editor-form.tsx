@@ -454,14 +454,6 @@ export function InvoiceEditorForm({
             </select>
           </label>
           <label className="text-sm text-zinc-700 md:col-span-2">
-            <span className="font-medium">จำนวนตัวอักษร</span>
-            <input
-              className={inputClass}
-              value={form.amountInWords}
-              onChange={(e) => setForm((prev) => ({ ...prev, amountInWords: e.target.value }))}
-            />
-          </label>
-          <label className="text-sm text-zinc-700 md:col-span-2">
             <span className="font-medium">หมายเหตุ</span>
             <textarea
               className={`${inputClass} resize-none`}

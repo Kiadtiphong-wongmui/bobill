@@ -217,6 +217,41 @@ graph TD
 
 ---
 
+
+### 🔹 7. Quotation Module (ใบเสนอราคา)
+โมดูลแยกจาก Invoice (ตาราง `Quotation` / `QuotationItem`) เลขที่อัตโนมัติรูปแบบ `QT-YYYYMM-00001` ทุก endpoint ต้องมี `Authorization: Bearer <token>`
+
+**Life-cycle** (บังคับที่ backend ใน `quotation.service.ts`; ตาราง transition อยู่ที่ `QUOTATION_TRANSITIONS`)
+
+```mermaid
+graph TD
+    A[สร้างใบเสนอราคา] --> B(DRAFT - ฉบับร่าง)
+    B -->|แก้ไขได้เฉพาะ DRAFT| B
+    B -->|send| C(SENT - ส่งแล้ว)
+    B -->|ลบ - เฉพาะ DRAFT| X[ลบจากฐานข้อมูล]
+    C -->|accept| D(ACCEPTED - ลูกค้าตอบรับ)
+    C -->|reject| E(REJECTED - ลูกค้าปฏิเสธ)
+    C -->|validUntil ผ่านไปแล้ว| F(EXPIRED - หมดอายุ)
+    D -->|convert-to-invoice| G[สร้าง Invoice DRAFT + บันทึก convertedInvoiceId]
+```
+
+- สถานะ `EXPIRED` ถูกคำนวณแบบ lazy: ทุกครั้งที่ list / get / stats / transition / convert ระบบจะเปลี่ยน `SENT` ที่ `validUntil` ก่อนวันนี้ให้เป็น `EXPIRED` (ไม่ต้องมี cron)
+- `status` จาก request body ถูกเพิกเฉย; สถานะเปลี่ยนผ่าน endpoint ด้านล่างเท่านั้น
+- VAT เปิด/ปิดได้ต่อใบ (`vatEnabled`, `vatRate` ค่าเริ่มต้น 7) คิดจากยอดหลังหักส่วนลด; `amountInWords` (บาทตัวอักษรไทย) คำนวณฝั่ง server ทุกครั้งที่บันทึก
+
+**Endpoints**
+- **GET `/api/quotations`**: รายการ + แบ่งหน้า. Query: `page`, `pageSize`(สูงสุด 50), `q`, `seller`, `buyer`, `status`, `from`, `to`, `sortBy` (`number|date|amount|seller|buyer|validUntil`), `sortDir`
+- **GET `/api/quotations/recent`** (`limit`), **GET `/api/quotations/stats`** (`year`; คืน `counts` แยกสถานะ, `totalAccepted`, `monthlyStats`)
+- **GET `/api/quotations/:id`**, **POST `/api/quotations`**, **PUT `/api/quotations/:id`** (เฉพาะ DRAFT)
+- **PATCH `/api/quotations/:id/send` | `/accept` | `/reject`**: เปลี่ยนสถานะตาม life-cycle (400 ถ้า transition ไม่ถูกต้อง)
+- **POST `/api/quotations/:id/convert-to-invoice`**: ต้องเป็น `ACCEPTED` และยังไม่เคยแปลง. สร้าง Invoice `DRAFT` โดย Invoice ไม่มีคอลัมน์ VAT จึงใส่ VAT เป็นรายการเพิ่ม 1 บรรทัด ("ภาษีมูลค่าเพิ่ม N%") และคงส่วนลดไว้ ทำให้ `grandTotal` ของ Invoice เท่ากับของใบเสนอราคา. คืน `{ quotation, invoice }`
+- **DELETE `/api/quotations/:id`**: ลบจริง เฉพาะ DRAFT (204)
+- **GET `/api/quotations/:id/export-pdf`**: PDF A4 หน้าเดียว (auto-fit ฟอนต์) ลายเซ็น: ผู้เสนอราคา / ผู้อนุมัติ
+
+**Frontend**: หน้า `/quotations` (รายการ + เมนูจัดการ), `/quotations/new`, `/quotations/:id` (แก้ไข DRAFT; สถานะอื่น redirect ไป view), `/quotations/:id/view`; proxy ที่ `frontend/app/api/quotations/**` (PATCH ใช้ `?action=send|accept|reject`, แปลงผ่าน `/api/quotations/:id/convert`)
+
+---
+
 ## 4. คอมโพเนนต์ร่วมของระบบ (Shared & Reusable Components)
 
 ระบบได้มีการออกแบบแยกชิ้นส่วน UI Components ส่วนกลางออกเป็นสัดส่วนเพื่อนำกลับมาใช้ซ้ำและบำรุงรักษาได้ง่าย ณ ตำแหน่งโฟลเดอร์ `frontend/components/ui/` ดังนี้:

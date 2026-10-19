@@ -36,7 +36,7 @@
 - **Development Tooling**: ใช้ `--webpack` ในการรัน Dev Server (`next dev --webpack`) เพื่ออำนวยความสะดวกเรื่องการทำ Hot-reload และ Polling บน Docker
 
 ### 🔹 Database Schema (Prisma Models)
-ระบบมี Database Schema หลักอยู่ 4 ตาราง/โมเดล ดังนี้ (อ้างอิงจาก `backend/prisma/schema.prisma`):
+ระบบมี Database Schema หลักอยู่ 6 ตาราง/โมเดล ดังนี้ (อ้างอิงจาก `backend/prisma/schema.prisma`):
 1. **`User`**: ข้อมูลบัญชีผู้ใช้
    - ฟิลด์หลัก: `id`, `username`, `password`, `createdAt`, `updatedAt`, `roles` (เป็น Enum: `ADMIN`, `USER` โดยค่าเริ่มต้นคือ `USER`)
 2. **`Invoice`**: ข้อมูลส่วนหัวและข้อมูลรวมของใบแจ้งหนี้
@@ -46,6 +46,9 @@
    - ความสัมพันธ์: `Relation` เชื่อมโยงกับ `Invoice` แบบ `Cascade` ลบใบแจ้งหนี้หลักแล้วจะลบรายการย่อยทั้งหมด
 4. **`EmployeeCard`**: ข้อมูลบัตรประจำตัวพนักงานขนาด 7.2 × 10.3 ซม. ทั้งสองด้าน
    - ฟิลด์หลัก: `id`, `cardHeader`, `photoUrl`, `name`, `nationality`, `workPermitNo`, `instructions`, `employerName`, `address`, `issueDate`, `expiryDate`, `signerName`, `signerPosition`, `telephone`
+5. **`Quotation`**: ใบเสนอราคา (ตารางแยกจาก Invoice)
+   - ฟิลด์หลัก: `quotationNumber` (Unique, รูปแบบ `QT-YYYYMM-00001`), `documentDate`, `validUntil`, ข้อมูลผู้ขาย/ผู้ซื้อ, `subtotal`, `discountTotal`, `vatEnabled`, `vatRate`, `vatAmount`, `grandTotal`, `amountInWords`, `status` (Enum `QuotationStatus`: `DRAFT`, `SENT`, `ACCEPTED`, `REJECTED`, `EXPIRED`), `convertedInvoiceId` (กันแปลงเป็น Invoice ซ้ำ), `signatures` (Json: `quotedBy`, `acceptedBy`)
+6. **`QuotationItem`**: รายการในใบเสนอราคา (`quotationId` + `lineNo` Unique, ลบตามใบหลักแบบ `Cascade`)
 
 ---
 

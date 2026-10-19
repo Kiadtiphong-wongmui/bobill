@@ -112,13 +112,7 @@ export function InvoiceEditorPreview({ form, itemTotals, subtotal, grandTotal }:
             </div>
           </div>
 
-          {/* Amount in words + note */}
-          {form.amountInWords ? (
-            <p className="mt-3 text-zinc-600">
-              <span className="font-medium text-zinc-700">จำนวนเงิน: </span>
-              {form.amountInWords}
-            </p>
-          ) : null}
+          {/* Note */}
           {form.note ? (
             <p className="mt-1 whitespace-pre-wrap text-red-600">
               * {form.note}
